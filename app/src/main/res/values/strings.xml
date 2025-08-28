@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">HomeWork_2_6</string>
+    <string name="email_adress">Email Adress</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="log_in">Log in</string>
+    <string name="choose_the_food">Choose the food</string>
+    <string name="food_you_love">Food you love</string>
+    <string name="search">Search</string>
+    <string name="cotegory">Category</string>
+    <string name="burger">Burgers</string>
+    <string name="salad_burger">Salad Burger</string>
+    <string name="_12">12$</string>
+</resources>
