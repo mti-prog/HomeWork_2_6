@@ -1,4 +1,4 @@
-package com.geeks.homework_2_6;
+package com.geeks.homework_2_6.items;
 
 public class FoodItem {
     private String image;
