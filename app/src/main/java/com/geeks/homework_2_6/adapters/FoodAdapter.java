@@ -16,13 +16,11 @@ import com.geeks.homework_2_6.items.FoodItem;
 import java.util.ArrayList;
 
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
-    private ArrayList<FoodItem> food = new ArrayList<>();
-    private int selectedItem = 0;
-    private RecyclerView recyclerView;
+    private ArrayList<FoodItem> food;
+    private int selectedItem = -1;
 
-    public FoodAdapter(ArrayList<FoodItem> food, RecyclerView recyclerView) {
+    public FoodAdapter(ArrayList<FoodItem> food) {
         this.food = food;
-        this.recyclerView = recyclerView;
     }
 
     @NonNull
@@ -35,25 +33,21 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
         holder.bind(food.get(position));
-        FoodItem item = food.get(position);
-        holder.binding.tvNameFood.setText(item.getName());
-        if (position == selectedItem){
+        if (position == selectedItem) {
             holder.binding.getRoot().setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.background_red_food));
-            holder.itemView.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200).start();
             holder.binding.tvNameFood.setTextColor(Color.WHITE);
             holder.binding.tvPriceFood.setTextColor(Color.WHITE);
-        }else{
+        } else {
             holder.binding.getRoot().setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.frame_def));
-            holder.itemView.animate().scaleX(1f).scaleY(1f).setDuration(200).start();
             holder.binding.tvNameFood.setTextColor(Color.GRAY);
             holder.binding.tvPriceFood.setTextColor(Color.GRAY);
         }
+
         holder.itemView.setOnClickListener(v -> {
-            int previousPosition = selectedItem;
+            int prev = selectedItem;
             selectedItem = holder.getAdapterPosition();
-            notifyItemChanged(previousPosition);
+            notifyItemChanged(prev);
             notifyItemChanged(selectedItem);
-            recyclerView.smoothScrollToPosition(selectedItem);
         });
     }
 
@@ -62,14 +56,28 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         return food.size();
     }
 
-    public class FoodViewHolder extends RecyclerView.ViewHolder {
+    public void setSelectedItem(int position) {
+        selectedItem = position;
+        notifyDataSetChanged();
+    }
+
+    public int getFirstMatchIndex(String query) {
+        query = query.toLowerCase();
+        for (int i = 0; i < food.size(); i++) {
+            if (food.get(i).getName().toLowerCase().contains(query)) return i;
+        }
+        return -1;
+    }
+
+    public static class FoodViewHolder extends RecyclerView.ViewHolder {
         private RvFoodItemBinding binding;
 
         public FoodViewHolder(RvFoodItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
-        public void bind(FoodItem foodItem){
+
+        public void bind(FoodItem foodItem) {
             Glide.with(binding.getRoot()).load(foodItem.getImage()).into(binding.ivFood);
             binding.tvNameFood.setText(foodItem.getName());
             binding.tvPriceFood.setText(foodItem.getPrice());

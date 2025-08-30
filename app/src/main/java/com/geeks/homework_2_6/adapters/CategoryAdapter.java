@@ -17,13 +17,13 @@ import com.geeks.homework_2_6.items.CategoryItem;
 import java.util.ArrayList;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
-    private ArrayList<CategoryItem> category = new ArrayList<>();
-    private CategoryOnClickListener categoryOnClick;
-    private int selectedPosition = 0;
+    private ArrayList<CategoryItem> category;
+    private CategoryOnClickListener clickListener;
+    private int selectedPosition = -1;
 
-    public CategoryAdapter(ArrayList<CategoryItem> category, CategoryOnClickListener categoryOnClickListener) {
+    public CategoryAdapter(ArrayList<CategoryItem> category, CategoryOnClickListener clickListener) {
         this.category = category;
-        this.categoryOnClick = categoryOnClickListener;
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -36,8 +36,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         holder.bind(category.get(position));
-        CategoryItem item = category.get(position);
-        holder.binding.tvFoodCate.setText(item.getName());
         if (position == selectedPosition) {
             holder.binding.tvFoodCate.setTextColor(Color.RED);
             holder.binding.ivFoodCate.setImageTintList(ColorStateList.valueOf(Color.RED));
@@ -47,17 +45,37 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             holder.binding.ivFoodCate.setImageTintList(ColorStateList.valueOf(Color.GRAY));
             holder.binding.getRoot().setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.frame_def));
         }
+
         holder.itemView.setOnClickListener(v -> {
-            int previousPosition = selectedPosition;
+            int prev = selectedPosition;
             selectedPosition = holder.getAdapterPosition();
-            notifyItemChanged(previousPosition);
+            notifyItemChanged(prev);
             notifyItemChanged(selectedPosition);
+            clickListener.onClick(category.get(selectedPosition));
         });
     }
 
     @Override
     public int getItemCount() {
         return category.size();
+    }
+
+    public void setSelectedCategory(int position) {
+        selectedPosition = position;
+        notifyDataSetChanged();
+    }
+
+    public int getCategoryIndex(String query) {
+        query = query.toLowerCase();
+        for (int i = 0; i < category.size(); i++) {
+            String name = category.get(i).getName().toLowerCase();
+            if ((name.equals("pizza") && query.contains("peperoni"))
+                    || (name.equals("burger") && query.contains("burger"))
+                    || (name.equals("chicken") && query.contains("chicken"))) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public class CategoryViewHolder extends RecyclerView.ViewHolder {
@@ -67,12 +85,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             super(binding.getRoot());
             this.binding = binding;
         }
-        public void bind(CategoryItem categoryItem){
+
+        public void bind(CategoryItem categoryItem) {
             binding.ivFoodCate.setImageResource(categoryItem.getImage());
             binding.tvFoodCate.setText(categoryItem.getName());
-            binding.getRoot().setOnClickListener(v -> {
-                categoryOnClick.onClick(categoryItem);
-            });
         }
     }
 }
